@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,8 +18,31 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    //тут начинается синглтон + новый текст
+    public static MainManager Instance;
+
+    public string playerInputText;
+
+    private const string PLAYER_TEXT_KEY = "PLAYER_INPUT_TEXT";
+
+
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        // Singleton
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        LoadPlayerText();
+    }
+
     void Start()
     {
         const float step = 0.6f;
@@ -72,5 +95,29 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+    // методы для обработки текста с именем игрока
+    public void SetPlayerText(string text)
+    {
+        playerInputText = text;
+        PlayerPrefs.SetString(PLAYER_TEXT_KEY, text);
+        PlayerPrefs.Save();
+    }
+
+    public string GetPlayerText()
+    {
+        return playerInputText;
+    }
+
+    private void LoadPlayerText()
+    {
+        if (PlayerPrefs.HasKey(PLAYER_TEXT_KEY))
+        {
+            playerInputText = PlayerPrefs.GetString(PLAYER_TEXT_KEY);
+        }
+        else
+        {
+            playerInputText = "";
+        }
     }
 }
