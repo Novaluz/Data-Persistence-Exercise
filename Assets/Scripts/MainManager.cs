@@ -5,19 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
-{
-    public Brick BrickPrefab;
-    public int LineCount = 6;
-    public Rigidbody Ball;
-
-    public Text ScoreText;
-    public GameObject GameOverText;
-    
-    private bool m_Started = false;
-    private int m_Points;
-    
-    private bool m_GameOver = false;
-
+{    
     //тут начинается синглтон + новый текст
     public static MainManager Instance;
 
@@ -26,7 +14,12 @@ public class MainManager : MonoBehaviour
     private const string PLAYER_TEXT_KEY = "PLAYER_INPUT_TEXT";
 
 
-    // Start is called before the first frame update
+    // передача очков и имени лучшего игрока в MainManager
+    public int bestScore;
+    public string bestPlayerName;
+
+    private const string BEST_SCORE_KEY = "BEST_SCORE";
+    private const string BEST_NAME_KEY = "BEST_NAME";
 
     private void Awake()
     {
@@ -41,61 +34,13 @@ public class MainManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         LoadPlayerText();
-    }
 
-    void Start()
-    {
-        const float step = 0.6f;
-        int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
-        for (int i = 0; i < LineCount; ++i)
-        {
-            for (int x = 0; x < perLine; ++x)
-            {
-                Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
-                var brick = Instantiate(BrickPrefab, position, Quaternion.identity);
-                brick.PointValue = pointCountArray[i];
-                brick.onDestroyed.AddListener(AddPoint);
-            }
-        }
-    }
+        LoadBestScore();
 
-    private void Update()
-    {
-        if (!m_Started)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                m_Started = true;
-                float randomDirection = Random.Range(-1.0f, 1.0f);
-                Vector3 forceDir = new Vector3(randomDirection, 1, 0);
-                forceDir.Normalize();
-
-                Ball.transform.SetParent(null);
-                Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
-            }
-        }
-        else if (m_GameOver)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
-        }
     }
+ 
 
-    void AddPoint(int point)
-    {
-        m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
-    }
 
-    public void GameOver()
-    {
-        m_GameOver = true;
-        GameOverText.SetActive(true);
-    }
     // методы для обработки текста с именем игрока
     public void SetPlayerText(string text)
     {
@@ -119,5 +64,37 @@ public class MainManager : MonoBehaviour
         {
             playerInputText = "";
         }
+    }
+
+    private void LoadBestScore()
+    {
+        bestScore = PlayerPrefs.GetInt(BEST_SCORE_KEY, 0);
+        bestPlayerName = PlayerPrefs.GetString(BEST_NAME_KEY, "Player");
+    }
+
+    public void TrySetBestScore(int score)
+    {
+        if (score <= bestScore)
+            return;
+
+        string playerName = playerInputText;
+
+        if (string.IsNullOrEmpty(playerName))
+        {
+            playerName = "Player";
+        }
+
+        bestScore = score;
+        bestPlayerName = playerName;
+
+        PlayerPrefs.SetInt(BEST_SCORE_KEY, bestScore);
+        PlayerPrefs.SetString(BEST_NAME_KEY, bestPlayerName);
+        PlayerPrefs.Save();
+    }
+
+
+    public string GetBestScoreText()
+    {
+        return $"Best Score : {bestPlayerName} : {bestScore}";
     }
 }

@@ -9,17 +9,26 @@ using UnityEngine.SceneManagement;
 
 public class MenuUIManager : MonoBehaviour
 {
-
+    //код для поля ввода имени игрока
     public TMP_InputField inputField;
+    // лучший результат
+    public TMP_Text bestScoreText;
+
 
     private void Start()
     {
-        // Подставляем сохранённый текст при открытии меню
         if (MainManager.Instance != null)
         {
+            // имя игрока
             inputField.text = MainManager.Instance.GetPlayerText();
+
+            // лучший результат
+            //bestScoreText.text = MainManager.Instance.GetBestScoreText();
         }
+        Debug.Log("Menu Start, BestScoreText from MM = "
+    + MainManager.Instance.GetBestScoreText());
     }
+
     public void OnInputChanged()
     {
         if (MainManager.Instance != null)
@@ -28,9 +37,34 @@ public class MenuUIManager : MonoBehaviour
         }
     }
 
+    //код для кнопки старта новой игры и выхода из игры
     public void StartNew()
     {
+        if (MainManager.Instance != null)
+        {
+            MainManager.Instance.SetPlayerText(inputField.text);
+        }
+        Debug.Log("Имя перед стартом: " + inputField.text);
+
         SceneManager.LoadScene(1);
+    }
+
+    //private void OnEnable()
+    //{
+    //    UpdateBestScoreUI();
+    //}
+
+    //private void UpdateBestScoreUI()
+    //{
+    //    if (MainManager.Instance == null || bestScoreText == null)
+    //        return;
+
+    //    bestScoreText.text = MainManager.Instance.GetBestScoreText();
+    //}
+
+    private void LateUpdate()
+    {
+        bestScoreText.text = MainManager.Instance.GetBestScoreText();
     }
 
     public void Exit()
