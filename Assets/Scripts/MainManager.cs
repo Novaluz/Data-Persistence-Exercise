@@ -69,20 +69,22 @@ public class MainManager : MonoBehaviour
     private void LoadBestScore()
     {
         bestScore = PlayerPrefs.GetInt(BEST_SCORE_KEY, 0);
-        bestPlayerName = PlayerPrefs.GetString(BEST_NAME_KEY, "Player");
+
+        if (PlayerPrefs.HasKey(BEST_NAME_KEY))
+            bestPlayerName = PlayerPrefs.GetString(BEST_NAME_KEY);
+        else
+            bestPlayerName = "Player";
     }
 
-    public void TrySetBestScore(int score)
+
+    public bool TrySetBestScore(int score)
     {
         if (score <= bestScore)
-            return;
+            return false;
 
         string playerName = playerInputText;
-
         if (string.IsNullOrEmpty(playerName))
-        {
             playerName = "Player";
-        }
 
         bestScore = score;
         bestPlayerName = playerName;
@@ -90,11 +92,25 @@ public class MainManager : MonoBehaviour
         PlayerPrefs.SetInt(BEST_SCORE_KEY, bestScore);
         PlayerPrefs.SetString(BEST_NAME_KEY, bestPlayerName);
         PlayerPrefs.Save();
+        Debug.Log($"NEW BEST SAVED: {bestScore} by {bestPlayerName}");
+
+        return true;
+        
+
     }
-
-
     public string GetBestScoreText()
     {
         return $"Best Score : {bestPlayerName} : {bestScore}";
     }
+
+    public void ResetBestScore()
+    {
+        bestScore = 0;
+        bestPlayerName = "Player";
+
+        PlayerPrefs.DeleteKey(BEST_SCORE_KEY);
+        PlayerPrefs.DeleteKey(BEST_NAME_KEY);
+        PlayerPrefs.Save();
+    }
+
 }

@@ -62,6 +62,15 @@ public class MenuUIManager : MonoBehaviour
         bestScoreText.text = MainManager.Instance.GetBestScoreText();
     }
 
+    public void ResetBestScore()
+    {
+        if (MainManager.Instance != null)
+        {
+            MainManager.Instance.ResetBestScore();
+            UpdateBestScoreUI();
+        }
+    }
+
 
     public void Exit()
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayManager : MonoBehaviour
 {
@@ -18,13 +19,14 @@ public class PlayManager : MonoBehaviour
 
     private bool m_GameOver = false;
 
-    public Text BestScoreText;
+    public TMP_Text BestScoreText;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
+        
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
@@ -38,12 +40,7 @@ public class PlayManager : MonoBehaviour
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
             }
-        }
-
-        if (MainManager.Instance != null)
-        {
-            BestScoreText.text = MainManager.Instance.GetBestScoreText();
-        }
+        }       
     }
 
     private void Update()
@@ -81,12 +78,39 @@ public class PlayManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
 
-        if (MainManager.Instance != null)
-        {
-            MainManager.Instance.TrySetBestScore(m_Points);
-            BestScoreText.text = MainManager.Instance.GetBestScoreText();
+        bool isNewBest = MainManager.Instance.TrySetBestScore(m_Points);
 
+        if (isNewBest)
+        {
+            UpdateBestScoreUI();
         }
+    }
+
+
+    void UpdateBestScoreUI()
+    {
+        Debug.Log("UpdateBestScoreUI called");
+
+        if (MainManager.Instance == null)
+        {
+            Debug.LogError("MainManager NULL");
+            return;
+        }
+
+        if (BestScoreText == null)
+        {
+            Debug.LogError("BestScoreText NULL");
+            return;
+        }
+
+        Debug.Log("BestScore = " + MainManager.Instance.GetBestScoreText());
+        BestScoreText.text = MainManager.Instance.GetBestScoreText();
+    }
+
+
+    void OnEnable()
+    {
+        UpdateBestScoreUI();
     }
 
 }
