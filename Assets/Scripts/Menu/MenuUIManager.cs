@@ -49,23 +49,19 @@ public class MenuUIManager : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-    //private void OnEnable()
-    //{
-    //    UpdateBestScoreUI();
-    //}
-
-    //private void UpdateBestScoreUI()
-    //{
-    //    if (MainManager.Instance == null || bestScoreText == null)
-    //        return;
-
-    //    bestScoreText.text = MainManager.Instance.GetBestScoreText();
-    //}
-
-    private void LateUpdate()
+    private void OnEnable()
     {
+        UpdateBestScoreUI();
+    }
+
+    private void UpdateBestScoreUI()
+    {
+        if (MainManager.Instance == null || bestScoreText == null)
+            return;
+
         bestScoreText.text = MainManager.Instance.GetBestScoreText();
     }
+
 
     public void Exit()
     {
